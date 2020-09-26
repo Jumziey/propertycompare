@@ -1,5 +1,10 @@
 package propertycost
 
+import (
+	"errors"
+	"math"
+)
+
 //### NOTES ####
 //PropertyTax (actual value)
 //Calculated as
@@ -17,10 +22,10 @@ package propertycost
 //Rent(decimal form) - The rent on the down payment if you have to take a loan to reach the required down payment.
 //Amortization(decimal form) - The required Amortization percentage on the down payment you hade to take a loan for.
 type DownPayment struct {
-	AmountInHand       float32
-	RequiredPercentage float32
-	Rent               float32
-	Amortization       float32
+	AmountInHand       float64
+	RequiredPercentage float64
+	Rent               float64
+	Amortization       float64
 }
 
 //RentRebate describes the rent rebate you get
@@ -30,9 +35,9 @@ type DownPayment struct {
 //AfterLimit(decimal form) - Rent rebate percentage after you reach the rent cost limit
 //Limit - Limit where you payed enough rentcosts to go to the AfterLimit rent rebate percentage
 type RentRebate struct {
-	Limit       float32
-	BeforeLimit float32
-	AfterLimit  float32
+	Limit       float64
+	BeforeLimit float64
+	AfterLimit  float64
 }
 
 //PropertyTax modelled after the Swedish system
@@ -40,34 +45,47 @@ type RentRebate struct {
 //Percent(decimal form) -  is the tax you need to pay on the taxation value of the house
 //Roof - the maximum value the property tax can reach.
 type PropertyTax struct {
-	TaxationValuePercentageOfValue float32
-	Percent                        float32
-	Roof                           float32
+	TaxationValuePercentageOfValue float64
+	Percent                        float64
+	Roof                           float64
 }
 
 //Rent(decimal form)
 //Amortization(decimal form)
 //DownPayment - self explanatory
 type Mortgage struct {
-	Rent         float32
-	Amortization float32
+	Rent         float64
+	Amortization float64
 	DownPayment  DownPayment
 }
 
-func CalculateMonthly(price, operatingCostMonthly float32, mortgage Mortgage, rentRebate RentRebate, propertyTax PropertyTax, propertyEnsuranceMonthly float32) (AmortizationMonthly, RealCostMonthly float32, err error) {
+func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, propertyTax PropertyTax, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
 	downPayment := mortgage.DownPayment
 
 	requiredDownPayment := price * downPayment.RequiredPercentage
+	downPaymentBorrowed := math.Max(0, requiredDownPayment-downPayment.AmountInHand)
 
-	mainRentCost := (price - requiredDownPayment) * mortgage.Rent * (1.0 - rentRebate.BeforeLimit)
-	mainAmortization := (price - requiredDownPayment) * mortgage.Amortization
+	mortgageAmount := price - (mortgage.DownPayment.AmountInHand + downPaymentBorrowed)
+	if mortgageAmount < 0 {
+		return 0, 0, errors.New("Can not down pay more then the price of the property")
+	}
 
-	dpRentCost := (requiredDownPayment - downPayment.AmountInHand) * downPayment.Rent * (1.0 - rentRebate.BeforeLimit)
-	dpAmortizationCost := (requiredDownPayment - downPayment.AmountInHand) * downPayment.Amortization
+	mainRent := mortgageAmount * mortgage.Rent
+	downPaymentRent := downPaymentBorrowed * downPayment.Rent
+	rent := mainRent + downPaymentRent
 
-	propertyTaxCost := propertyTax.Roof / 12.0
+	rebate := math.Min(rent, rentRebate.Limit)*rentRebate.BeforeLimit +
+		math.Max(0, rent-rentRebate.Limit)*rentRebate.AfterLimit
 
-	return mainRentCost/12 + dpRentCost/12 + operatingCostMonthly + propertyEnsuranceMonthly + propertyTaxCost,
+	rentCost := rent - rebate
+
+	mainAmortization := (mortgageAmount) * mortgage.Amortization
+
+	dpAmortizationCost := (downPaymentBorrowed) * downPayment.Amortization
+
+	propertyTaxCost := math.Min(price*propertyTax.Percent, propertyTax.Roof) / 12.0
+
+	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + propertyTaxCost,
 		mainAmortization/12 + dpAmortizationCost/12,
 		nil
 }
@@ -76,7 +94,7 @@ func CalculateMonthly(price, operatingCostMonthly float32, mortgage Mortgage, re
 //for mortgage deeds and title deeds, and returns the total extra cost at purchase.
 //
 //taxes are given i a decimal percentage i.e 50% = 0.5
-func ExtraAtPurchase(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax float32) float32 {
+func ExtraAtPurchase(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax float64) float64 {
 	mortgageCost := (price - mortgageDeedCurrent) * mortgageDeedTax
 	titleDeedCost := price * titleDeedTax
 	return mortgageCost + titleDeedCost
