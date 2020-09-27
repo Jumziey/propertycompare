@@ -26,8 +26,9 @@ func TestCalculateMonthly(t *testing.T) {
 		AfterLimit:  0.21,
 	}
 	propertyTax := PropertyTax{
-		Percent: 0.0075,
-		Roof:    8439,
+		TaxationValuePercentageOfValue: 0.75,
+		Percent:                        0.0075,
+		Roof:                           8439,
 	}
 
 	expectedAmortizationMonthly := float64(7640)
@@ -58,8 +59,9 @@ func TestCalculateMonthlyMoreDownPaymentThenRequired(t *testing.T) {
 		AfterLimit:  0.21,
 	}
 	propertyTax := PropertyTax{
-		Percent: 0.0075,
-		Roof:    8439,
+		TaxationValuePercentageOfValue: 0.75,
+		Percent:                        0.0075,
+		Roof:                           8439,
 	}
 
 	expectedRealCostMonthly := float64(6255.333333)
@@ -90,8 +92,9 @@ func TestCalculateMonthlyTooMuchDownPayment(t *testing.T) {
 		AfterLimit:  0.21,
 	}
 	propertyTax := PropertyTax{
-		Percent: 0.0075,
-		Roof:    8439,
+		TaxationValuePercentageOfValue: 0.75,
+		Percent:                        0.0075,
+		Roof:                           8439,
 	}
 
 	_, _, err := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyTax, propertyEnsuranceMonthly)
@@ -118,8 +121,9 @@ func TestCalculateMonthlyRentRebateAboveLimit(t *testing.T) {
 		AfterLimit:  0.21,
 	}
 	propertyTax := PropertyTax{
-		Percent: 0.0075,
-		Roof:    8439,
+		TaxationValuePercentageOfValue: 0.75,
+		Percent:                        0.0075,
+		Roof:                           8439,
 	}
 
 	expectedAmortizationMonthly := float64(7640)
@@ -130,6 +134,7 @@ func TestCalculateMonthlyRentRebateAboveLimit(t *testing.T) {
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
 
+//THIS IS WRONG, PRICE SHOULD BE 75% of price!!!
 func TestCalculateMonthlyPropertyTaxBelowRoof(t *testing.T) {
 	price := float64(1000000)
 	operatingCostMonthly := float64(1000)
@@ -150,8 +155,9 @@ func TestCalculateMonthlyPropertyTaxBelowRoof(t *testing.T) {
 		AfterLimit:  0.21,
 	}
 	propertyTax := PropertyTax{
-		Percent: 0.0075,
-		Roof:    8439,
+		TaxationValuePercentageOfValue: 0.75,
+		Percent:                        0.0075,
+		Roof:                           8439,
 	}
 
 	expectedRealCostMonthly := float64(6883.5)
