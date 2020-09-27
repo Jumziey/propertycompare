@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/jumziey/propertycost/pkg/propertycost"
 	"github.com/spf13/cobra"
@@ -83,8 +84,26 @@ func main() {
 		Short:   "Calculates the monthly cost for the property",
 		Long:    "It's calculating using all the rules relevant for small housing in Sweden",
 		Version: "0.0.1",
+		Args:    cobra.ExactArgs(4),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("costs")
+			price, err := strconv.ParseFloat(args[0], 64)
+			if err != nil {
+				log.Fatalw("Can't convert <price> to float", "error", err)
+			}
+			// operatingCostMonthly, err := strconv.ParseFloat(args[1], 64)
+			// if err != nil {
+			// 	log.Fatalw("Can't convert <operating cost monthly> to float", "error", err)
+			// }
+			// propertyInsuranceMonthly, err := strconv.ParseFloat(args[2], 64)
+			// if err != nil {
+			// 	log.Fatalw("Can't convert <propertyInsuranceMonthly> to float", "error", err)
+			// }
+			mortgageDeedCurrent, err := strconv.ParseFloat(args[3], 64)
+			if err != nil {
+				log.Fatalw("Can't convert <current mortgage deed> to float", "error", err)
+			}
+			extracost := propertycost.ExtraAtPurchase(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
+			fmt.Println("Extra cost for this property: ", extracost)
 		},
 	})
 
