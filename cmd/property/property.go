@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jumziey/propertycost/pkg/propertycost"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
@@ -97,7 +98,6 @@ func main() {
 				log.Fatalw("Can't convert <current mortgage deed> to float", "error", err)
 			}
 			extracost := propertycost.ExtraAtPurchase(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
-			fmt.Println("Extra cost for this property: ", extracost)
 
 			realCostMonthly, amortizationMonthly, err := propertycost.CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyInsuranceMonthly)
 			if err != nil {
@@ -110,11 +110,22 @@ func main() {
 			rebate := propertycost.Rebate(mRent+dpRent, rentRebate)
 			taxPropertyCost := propertycost.TaxPropertyCost(price, taxProperty)
 
-			fmt.Println("requiredDownPayment", propertycost.RequiredDownPayment(price, mortgage.DownPayment))
-			fmt.Println("realCostMonthly:", realCostMonthly)
-			fmt.Println("realCostMonthlyWithoutRebateAndTax:", realCostMonthly-taxPropertyCost/12+rebate/12)
-			fmt.Println("amortizationMonthly:", amortizationMonthly)
-			fmt.Println("payments:", realCostMonthly+amortizationMonthly)
+			t := table.NewWriter()
+			t.SetStyle(table.StyleLight)
+			t.SetOutputMirror(os.Stdout)
+			t.AppendRows([]table.Row{
+				{"Total cash needed outside mortgage", fmt.Sprintf("%.1f", propertycost.RequiredDownPayment(price, mortgage.DownPayment)+extracost)},
+				{"One time cost at purchase", fmt.Sprintf("%.1f", extracost)},
+				{"Down payment required", fmt.Sprintf("%.1f", propertycost.RequiredDownPayment(price, mortgage.DownPayment))},
+			})
+			t.AppendSeparator()
+			t.AppendRows([]table.Row{
+				{"Monthly payment With Rebate And Tax", fmt.Sprintf("%.1f", realCostMonthly+amortizationMonthly)},
+				{"Monthly payment Without Rebate And Tax", fmt.Sprintf("%.1f", realCostMonthly+amortizationMonthly-taxPropertyCost/12+rebate/12)},
+				{"Real cost monthly (with rebate and tax)", fmt.Sprintf("%.1f", realCostMonthly)},
+				{"Amortization monthly", fmt.Sprintf("%.1f", amortizationMonthly)},
+			})
+			t.Render()
 		},
 	})
 
