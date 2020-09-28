@@ -6,12 +6,12 @@ import (
 )
 
 //### NOTES ####
-//PropertyTax (actual value)
+//TaxProperty (actual value)
 //Calculated as
-//PropertyTaxValue = 75 percent of price
+//TaxPropertyValue = 75 percent of price
 //(not a true value, normally its decided on the average costs
 // of properties in your neighbourhood over the last 3 years.)
-//PropertyTax = min(8349, PropertyTaxValue*0.0075)
+//TaxProperty = min(8349, TaxPropertyValue*0.0075)
 //i.e. everything above 1 484 267(sek)
 //
 
@@ -40,11 +40,11 @@ type RentRebate struct {
 	AfterLimit  float64
 }
 
-//PropertyTax modelled after the Swedish system
+//TaxProperty modelled after the Swedish system
 //TaxationValuePercentageOfValue(decimal form) - Is the stupid percentage of the market value of your house which counts to the taxation value. Its complicated in how the market price is set, here we approximate it to be the price of the house.
 //Percent(decimal form) -  is the tax you need to pay on the taxation value of the house
 //Roof - the maximum value the property tax can reach.
-type PropertyTax struct {
+type TaxProperty struct {
 	TaxationValuePercentageOfValue float64
 	Percent                        float64
 	Roof                           float64
@@ -64,7 +64,7 @@ func RequiredDownPayment(price float64, downPayment DownPayment) float64 {
 }
 
 //Hmm need to solve issue of rebateandtax being yearly if not jämkad.
-func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, propertyTax PropertyTax, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
+func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
 	downPayment := mortgage.DownPayment
 
 	downPaymentBorrowed := math.Max(0, RequiredDownPayment(price, downPayment)-downPayment.AmountInHand)
@@ -87,9 +87,9 @@ func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, re
 
 	dpAmortizationCost := (downPaymentBorrowed) * downPayment.Amortization
 
-	propertyTaxCost := math.Min(price*propertyTax.TaxationValuePercentageOfValue*propertyTax.Percent, propertyTax.Roof) / 12.0
+	taxPropertyCost := math.Min(price*taxProperty.TaxationValuePercentageOfValue*taxProperty.Percent, taxProperty.Roof) / 12.0
 
-	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + propertyTaxCost,
+	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + taxPropertyCost,
 		mainAmortization/12 + dpAmortizationCost/12,
 		nil
 }

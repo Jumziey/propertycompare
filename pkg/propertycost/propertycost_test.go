@@ -25,7 +25,7 @@ func TestCalculateMonthly(t *testing.T) {
 		BeforeLimit: 0.3,
 		AfterLimit:  0.21,
 	}
-	propertyTax := PropertyTax{
+	taxProperty := TaxProperty{
 		TaxationValuePercentageOfValue: 1,
 		Percent:                        0.0075,
 		Roof:                           8439,
@@ -34,7 +34,7 @@ func TestCalculateMonthly(t *testing.T) {
 	expectedAmortizationMonthly := float64(7640)
 	expectedRealCostMonthly := float64(8595.08333333)
 
-	realCostMonthly, amortizationMonthly, _ := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyTax, propertyEnsuranceMonthly)
+	realCostMonthly, amortizationMonthly, _ := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyEnsuranceMonthly)
 	assert.InDelta(t, expectedRealCostMonthly, realCostMonthly, 0.001, "RealCostMonthly")
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
@@ -58,7 +58,7 @@ func TestCalculateMonthlyMoreDownPaymentThenRequired(t *testing.T) {
 		BeforeLimit: 0.3,
 		AfterLimit:  0.21,
 	}
-	propertyTax := PropertyTax{
+	taxProperty := TaxProperty{
 		TaxationValuePercentageOfValue: 1,
 		Percent:                        0.0075,
 		Roof:                           8439,
@@ -67,7 +67,7 @@ func TestCalculateMonthlyMoreDownPaymentThenRequired(t *testing.T) {
 	expectedRealCostMonthly := float64(6255.333333)
 	expectedAmortizationMonthly := float64(5208.3333333)
 
-	realCostMonthly, amortizationMonthly, _ := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyTax, propertyEnsuranceMonthly)
+	realCostMonthly, amortizationMonthly, _ := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyEnsuranceMonthly)
 	assert.InDelta(t, expectedRealCostMonthly, realCostMonthly, 0.001, "RealCostMonthly")
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
@@ -91,13 +91,13 @@ func TestCalculateMonthlyTooMuchDownPayment(t *testing.T) {
 		BeforeLimit: 0.3,
 		AfterLimit:  0.21,
 	}
-	propertyTax := PropertyTax{
+	taxProperty := TaxProperty{
 		TaxationValuePercentageOfValue: 0.75,
 		Percent:                        0.0075,
 		Roof:                           8439,
 	}
 
-	_, _, err := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyTax, propertyEnsuranceMonthly)
+	_, _, err := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyEnsuranceMonthly)
 	assert.NotNil(t, err)
 }
 
@@ -120,7 +120,7 @@ func TestCalculateMonthlyRentRebateAboveLimit(t *testing.T) {
 		BeforeLimit: 0.3,
 		AfterLimit:  0.21,
 	}
-	propertyTax := PropertyTax{
+	taxProperty := TaxProperty{
 		TaxationValuePercentageOfValue: 1,
 		Percent:                        0.0075,
 		Roof:                           8439,
@@ -129,12 +129,12 @@ func TestCalculateMonthlyRentRebateAboveLimit(t *testing.T) {
 	expectedAmortizationMonthly := float64(7640)
 	expectedRealCostMonthly := float64(13451.033333333333)
 
-	realCostMonthly, amortizationMonthly, _ := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyTax, propertyEnsuranceMonthly)
+	realCostMonthly, amortizationMonthly, _ := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyEnsuranceMonthly)
 	assert.InDelta(t, expectedRealCostMonthly, realCostMonthly, 0.001, "RealCostMonthly")
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
 
-func TestCalculateMonthlyPropertyTaxBelowRoof(t *testing.T) {
+func TestCalculateMonthlyTaxPropertyBelowRoof(t *testing.T) {
 	price := float64(1000000)
 	operatingCostMonthly := float64(1000)
 	propertyEnsuranceMonthly := float64(2000)
@@ -153,7 +153,7 @@ func TestCalculateMonthlyPropertyTaxBelowRoof(t *testing.T) {
 		BeforeLimit: 0.3,
 		AfterLimit:  0.21,
 	}
-	propertyTax := PropertyTax{
+	taxProperty := TaxProperty{
 		TaxationValuePercentageOfValue: 0.75,
 		Percent:                        0.0075,
 		Roof:                           8439,
@@ -162,7 +162,7 @@ func TestCalculateMonthlyPropertyTaxBelowRoof(t *testing.T) {
 	expectedRealCostMonthly := float64(6727.25)
 	expectedAmortizationMonthly := float64(5090)
 
-	realCostMonthly, amortizationMonthly, _ := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyTax, propertyEnsuranceMonthly)
+	realCostMonthly, amortizationMonthly, _ := CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyEnsuranceMonthly)
 	assert.InDelta(t, expectedRealCostMonthly, realCostMonthly, 0.001, "RealCostMonthly")
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
