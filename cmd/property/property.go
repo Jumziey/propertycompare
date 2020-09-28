@@ -55,7 +55,7 @@ func main() {
 	taxMortgageDeed := conf.GetFloat64("tax.mortage-deed")
 	taxTitleDeed := conf.GetFloat64("tax.title-deed")
 
-	taxProperty := propertycost.PropertyTax{
+	taxProperty := propertycost.TaxProperty{
 		TaxationValuePercentageOfValue: conf.GetFloat64("tax.property.taxation-value-percentage-of-value"),
 		Percent:                        conf.GetFloat64("tax.property.percent"),
 		Roof:                           conf.GetFloat64("tax.property.roof"),
@@ -103,8 +103,16 @@ func main() {
 			if err != nil {
 				log.Fatalw("can't calculate monthly costs", "error", err)
 			}
+			mRent, dpRent, err := propertycost.Rent(price, mortgage)
+			if err != nil {
+				log.Fatalw("can't calculate rent", "error", err)
+			}
+			rebate := propertycost.Rebate(mRent+dpRent, rentRebate)
+			taxPropertyCost := propertycost.TaxPropertyCost(price, taxProperty)
+
 			fmt.Println("requiredDownPayment", propertycost.RequiredDownPayment(price, mortgage.DownPayment))
 			fmt.Println("realCostMonthly:", realCostMonthly)
+			fmt.Println("realCostMonthlyWithoutRebateAndTax:", realCostMonthly-taxPropertyCost/12+rebate/12)
 			fmt.Println("amortizationMonthly:", amortizationMonthly)
 			fmt.Println("payments:", realCostMonthly+amortizationMonthly)
 		},
