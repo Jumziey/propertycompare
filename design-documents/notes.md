@@ -23,15 +23,16 @@ Want a config with everything that wont change between properties, but for other
 - title-deed-tax
 ```
 > property cost <price> <operating costs monthly> <property insurance monthly> <current mortgage deed>
-+------------------------------------+--------+
-| Total cash needed outside mortgage | amount |
-| One time cost at purchase          | amount |
-| down payment required              | amount |
-+------------------------------------+--------+
-| Total monthly payment ------------ | amount |
-| Real cost monthly                  | amount |
-| Amortization monthly               | amount |
-+------------------------------------+--------+
++----------------------------------------------+--------+
+| Total cash needed outside mortgage --------- | amount |
+| One time cost at purchase                    | amount |
+| down payment required                        | amount |
++----------------------------------------------+--------+
+| Total monthly payment With Rebate And Tax    | amount |
+| Total monthly payment Without Rebate And Tax | amount |
+| Real cost monthly                            | amount |
+| Amortization monthly                         | amount |
++----------------------------------------------+--------+
 ```
 ### property add
 ### property remove
