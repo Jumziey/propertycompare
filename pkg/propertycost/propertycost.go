@@ -59,39 +59,75 @@ type Mortgage struct {
 	DownPayment  DownPayment
 }
 
+//Hmm need to solve issue of rebateandtax being yearly if not jämkad.
+func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
+
+	mainRent, downPaymentRent, err := Rent(price, mortgage)
+	if err != nil {
+		return 0, 0, err
+	}
+	rent := mainRent + downPaymentRent
+	rentCost := rent - Rebate(rent, rentRebate)
+
+	mainAmortization, dpAmortization, err := Amortization(price, mortgage)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + TaxPropertyCost(price, taxProperty)/12.0,
+		mainAmortization/12 + dpAmortization/12,
+		nil
+}
+
+func TaxPropertyCost(price float64, taxProperty TaxProperty) float64 {
+	return math.Min(price*taxProperty.TaxationValuePercentageOfValue*taxProperty.Percent, taxProperty.Roof)
+}
+
+func Rebate(rentTotal float64, rentRebate RentRebate) float64 {
+	return math.Min(rentTotal, rentRebate.Limit)*rentRebate.BeforeLimit +
+		math.Max(0, rentTotal-rentRebate.Limit)*rentRebate.AfterLimit
+}
+
+func Amortization(price float64, mortgage Mortgage) (mainAmortization float64, downPaymentAmortization float64, err error) {
+
+	mortgageTot, err := mortgageTotal(price, mortgage)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	mainAmortization = (mortgageTot) * mortgage.Amortization
+	downPaymentAmortization = downPaymentBorrowed(price, mortgage.DownPayment) * mortgage.DownPayment.Amortization
+
+	return mainAmortization, downPaymentAmortization, nil
+}
+
 func RequiredDownPayment(price float64, downPayment DownPayment) float64 {
 	return price * downPayment.RequiredPercentage
 }
 
-//Hmm need to solve issue of rebateandtax being yearly if not jämkad.
-func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
+func downPaymentBorrowed(price float64, downPayment DownPayment) float64 {
+	return math.Max(0, RequiredDownPayment(price, downPayment)-downPayment.AmountInHand)
+}
+
+func Rent(price float64, mortgage Mortgage) (mainRent float64, downPaymentRent float64, err error) {
 	downPayment := mortgage.DownPayment
 
-	downPaymentBorrowed := math.Max(0, RequiredDownPayment(price, downPayment)-downPayment.AmountInHand)
-
-	mortgageAmount := price - (mortgage.DownPayment.AmountInHand + downPaymentBorrowed)
-	if mortgageAmount < 0 {
-		return 0, 0, errors.New("Can not down pay more then the price of the property")
+	mortgageTot, err := mortgageTotal(price, mortgage)
+	if err != nil {
+		return 0, 0, err
 	}
 
-	mainRent := mortgageAmount * mortgage.Rent
-	downPaymentRent := downPaymentBorrowed * downPayment.Rent
-	rent := mainRent + downPaymentRent
+	mainRent = mortgageTot * mortgage.Rent
+	downPaymentRent = downPaymentBorrowed(price, mortgage.DownPayment) * downPayment.Rent
+	return mainRent, downPaymentRent, nil
+}
 
-	rebate := math.Min(rent, rentRebate.Limit)*rentRebate.BeforeLimit +
-		math.Max(0, rent-rentRebate.Limit)*rentRebate.AfterLimit
-
-	rentCost := rent - rebate
-
-	mainAmortization := (mortgageAmount) * mortgage.Amortization
-
-	dpAmortizationCost := (downPaymentBorrowed) * downPayment.Amortization
-
-	taxPropertyCost := math.Min(price*taxProperty.TaxationValuePercentageOfValue*taxProperty.Percent, taxProperty.Roof) / 12.0
-
-	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + taxPropertyCost,
-		mainAmortization/12 + dpAmortizationCost/12,
-		nil
+func mortgageTotal(price float64, mortgage Mortgage) (float64, error) {
+	mortgageAmount := price - (mortgage.DownPayment.AmountInHand + downPaymentBorrowed(price, mortgage.DownPayment))
+	if mortgageAmount < 0 {
+		return 0, errors.New("Can not down pay more then the price of the property")
+	}
+	return mortgageAmount, nil
 }
 
 //Takes the price of the house with the mortgage deed currently on the house and relevant tax percentage
