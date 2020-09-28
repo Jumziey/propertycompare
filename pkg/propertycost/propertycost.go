@@ -79,15 +79,22 @@ func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, re
 		nil
 }
 
+func RequiredDownPayment(price float64, downPayment DownPayment) float64 {
+	return price * downPayment.RequiredPercentage
+}
+
+//Yearly
 func TaxPropertyCost(price float64, taxProperty TaxProperty) float64 {
 	return math.Min(price*taxProperty.TaxationValuePercentageOfValue*taxProperty.Percent, taxProperty.Roof)
 }
 
+//Yearly
 func Rebate(rentTotal float64, rentRebate RentRebate) float64 {
 	return math.Min(rentTotal, rentRebate.Limit)*rentRebate.BeforeLimit +
 		math.Max(0, rentTotal-rentRebate.Limit)*rentRebate.AfterLimit
 }
 
+//Yearly
 func Amortization(price float64, mortgage Mortgage) (mainAmortization float64, downPaymentAmortization float64, err error) {
 
 	mortgageTot, err := mortgageTotal(price, mortgage)
@@ -101,14 +108,7 @@ func Amortization(price float64, mortgage Mortgage) (mainAmortization float64, d
 	return mainAmortization, downPaymentAmortization, nil
 }
 
-func RequiredDownPayment(price float64, downPayment DownPayment) float64 {
-	return price * downPayment.RequiredPercentage
-}
-
-func downPaymentBorrowed(price float64, downPayment DownPayment) float64 {
-	return math.Max(0, RequiredDownPayment(price, downPayment)-downPayment.AmountInHand)
-}
-
+//Yearly
 func Rent(price float64, mortgage Mortgage) (mainRent float64, downPaymentRent float64, err error) {
 	downPayment := mortgage.DownPayment
 
@@ -120,6 +120,10 @@ func Rent(price float64, mortgage Mortgage) (mainRent float64, downPaymentRent f
 	mainRent = mortgageTot * mortgage.Rent
 	downPaymentRent = downPaymentBorrowed(price, mortgage.DownPayment) * downPayment.Rent
 	return mainRent, downPaymentRent, nil
+}
+
+func downPaymentBorrowed(price float64, downPayment DownPayment) float64 {
+	return math.Max(0, RequiredDownPayment(price, downPayment)-downPayment.AmountInHand)
 }
 
 func mortgageTotal(price float64, mortgage Mortgage) (float64, error) {
