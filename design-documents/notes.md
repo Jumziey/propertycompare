@@ -40,5 +40,7 @@ Want a config with everything that wont change between properties, but for other
 ## database
 Want online syncing, looking at amazon dynamodb for add/remove/list directly. Do want to start with simple file list or similar to start with. Useful option to have and a great way to start.
 
+## Then what?
+
 
 
