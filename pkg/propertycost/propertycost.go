@@ -59,11 +59,15 @@ type Mortgage struct {
 	DownPayment  DownPayment
 }
 
+func RequiredDownPayment(price float64, downPayment DownPayment) float64 {
+	return price * downPayment.RequiredPercentage
+}
+
+//Hmm need to solve issue of rebateandtax being yearly if not jämkad.
 func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, propertyTax PropertyTax, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
 	downPayment := mortgage.DownPayment
 
-	requiredDownPayment := price * downPayment.RequiredPercentage
-	downPaymentBorrowed := math.Max(0, requiredDownPayment-downPayment.AmountInHand)
+	downPaymentBorrowed := math.Max(0, RequiredDownPayment(price, downPayment)-downPayment.AmountInHand)
 
 	mortgageAmount := price - (mortgage.DownPayment.AmountInHand + downPaymentBorrowed)
 	if mortgageAmount < 0 {

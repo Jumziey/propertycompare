@@ -72,12 +72,6 @@ func main() {
 		},
 	}
 
-	fmt.Println(rentRebate)
-	fmt.Println(taxMortgageDeed)
-	fmt.Println(taxTitleDeed)
-	fmt.Println(taxProperty)
-	fmt.Println(mortgage)
-
 	rootCmd := &cobra.Command{Use: "property"}
 	rootCmd.AddCommand(&cobra.Command{
 		Use:     "cost <price> <operating costs monthly> <property insurance monthly> <current mortgage deed>",
@@ -90,20 +84,29 @@ func main() {
 			if err != nil {
 				log.Fatalw("Can't convert <price> to float", "error", err)
 			}
-			// operatingCostMonthly, err := strconv.ParseFloat(args[1], 64)
-			// if err != nil {
-			// 	log.Fatalw("Can't convert <operating cost monthly> to float", "error", err)
-			// }
-			// propertyInsuranceMonthly, err := strconv.ParseFloat(args[2], 64)
-			// if err != nil {
-			// 	log.Fatalw("Can't convert <propertyInsuranceMonthly> to float", "error", err)
-			// }
+			operatingCostMonthly, err := strconv.ParseFloat(args[1], 64)
+			if err != nil {
+				log.Fatalw("Can't convert <operating cost monthly> to float", "error", err)
+			}
+			propertyInsuranceMonthly, err := strconv.ParseFloat(args[2], 64)
+			if err != nil {
+				log.Fatalw("Can't convert <propertyInsuranceMonthly> to float", "error", err)
+			}
 			mortgageDeedCurrent, err := strconv.ParseFloat(args[3], 64)
 			if err != nil {
 				log.Fatalw("Can't convert <current mortgage deed> to float", "error", err)
 			}
 			extracost := propertycost.ExtraAtPurchase(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
 			fmt.Println("Extra cost for this property: ", extracost)
+
+			realCostMonthly, amortizationMonthly, err := propertycost.CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyInsuranceMonthly)
+			if err != nil {
+				log.Fatalw("can't calculate monthly costs", "error", err)
+			}
+			fmt.Println("requiredDownPayment", propertycost.RequiredDownPayment(price, mortgage.DownPayment))
+			fmt.Println("realCostMonthly:", realCostMonthly)
+			fmt.Println("amortizationMonthly:", amortizationMonthly)
+			fmt.Println("payments:", realCostMonthly+amortizationMonthly)
 		},
 	})
 
