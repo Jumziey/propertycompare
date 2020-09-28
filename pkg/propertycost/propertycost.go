@@ -83,7 +83,7 @@ func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, re
 
 	dpAmortizationCost := (downPaymentBorrowed) * downPayment.Amortization
 
-	propertyTaxCost := math.Min(price*propertyTax.Percent, propertyTax.Roof) / 12.0
+	propertyTaxCost := math.Min(price*propertyTax.TaxationValuePercentageOfValue*propertyTax.Percent, propertyTax.Roof) / 12.0
 
 	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + propertyTaxCost,
 		mainAmortization/12 + dpAmortizationCost/12,

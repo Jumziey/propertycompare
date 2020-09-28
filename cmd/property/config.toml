@@ -1,0 +1,27 @@
+# Example config using 
+# swedish laws for 2021
+# and some random search
+# for mortgage and down payment
+# costs.
+[rent-rebate]
+	limit = 100000
+	before-limit = 0.3
+	after-limit = 0.21
+
+[tax]
+	mortage-deed = 0.02
+	title-deed = 0.015
+	[tax.property]
+		taxation-value-percentage-of-value = 0.75
+		percent = 0.075
+		roof = 8349
+
+[mortgage]
+	rent = 0.017
+	amortization = 0.02
+		[mortgage.down-payment]
+			amount-in-hand = 0 
+			required-percentage = 0.15
+			rent = 0.02
+			amortization = 0.02
+
