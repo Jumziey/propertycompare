@@ -10,7 +10,6 @@ jobs:
       - checkout
       - run: go get -v ./...
       - run: go build ./...
-jobs:
   test:
     docker:
       - image: circleci/golang:1.15.2
