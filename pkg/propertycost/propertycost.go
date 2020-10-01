@@ -5,16 +5,6 @@ import (
 	"math"
 )
 
-//### NOTES ####
-//TaxProperty (actual value)
-//Calculated as
-//TaxPropertyValue = 75 percent of price
-//(not a true value, normally its decided on the average costs
-// of properties in your neighbourhood over the last 3 years.)
-//TaxProperty = min(8349, TaxPropertyValue*0.0075)
-//i.e. everything above 1 484 267(sek)
-//
-
 //DownPayment describes a down payment and
 //its assocciated costs.
 //AmountInHand - how much money you have to pay down on the price of the house
@@ -132,11 +122,6 @@ func Rent(price float64, mortgage Mortgage) (mainRent float64, downPaymentRent f
 //taxes are given i a decimal percentage i.e 50% = 0.5
 func HousePurchaseFees(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax float64) float64 {
 	return MortgageDeed(price, mortgageDeedCurrent, mortgageDeedTax) + TitleDeed(price, titleDeedTax)
-}
-
-//taxes are given i a decimal percentage i.e 50% = 0.5
-func CondoPurchaseFees(price, mortgageDeedCurrent, mortgageDeedTax float64) float64 {
-	return MortgageDeed(price, mortgageDeedCurrent, mortgageDeedTax)
 }
 
 //taxes are given i a decimal percentage i.e 50% = 0.5

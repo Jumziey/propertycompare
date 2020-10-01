@@ -286,14 +286,3 @@ func TestCondoMonthlyRentRebateAboveLimit(t *testing.T) {
 	assert.InDelta(t, expectedRealCostMonthly, realCostMonthly, 0.001, "RealCostMonthly")
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
-
-func TestCondoPurchaseFees(t *testing.T) {
-	price := float64(1000000)
-	mortgageDeedTax := float64(0.2)
-	mortgageDeedCurrent := float64(400000)
-	expectedFees := float64(120000)
-
-	fees := CondoPurchaseFees(price, mortgageDeedCurrent, mortgageDeedTax)
-
-	assert.InDelta(t, expectedFees, fees, 1)
-}
