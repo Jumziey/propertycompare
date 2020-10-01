@@ -127,6 +127,11 @@ func HousePurchaseFees(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax
 }
 
 //taxes are given i a decimal percentage i.e 50% = 0.5
+func CondoPurchaseFees(price, mortgageDeedCurrent, mortgageDeedTax float64) float64 {
+	return MortgageDeed(price, mortgageDeedCurrent, mortgageDeedTax)
+}
+
+//taxes are given i a decimal percentage i.e 50% = 0.5
 func MortgageDeed(price, mortgageDeedCurrent, mortgageDeedTax float64) float64 {
 	return (price - mortgageDeedCurrent) * mortgageDeedTax
 }
