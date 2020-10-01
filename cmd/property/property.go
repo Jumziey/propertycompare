@@ -75,7 +75,7 @@ func main() {
 
 	rootCmd := &cobra.Command{Use: "property"}
 	rootCmd.AddCommand(&cobra.Command{
-		Use:     "cost <price> <operating costs monthly> <property insurance monthly> <current mortgage deed>",
+		Use:     "cost <price> <operating costs yearly> <property insurance monthly> <current mortgage deed>",
 		Short:   "Calculates the monthly cost for the property",
 		Long:    "It's calculating using all the rules relevant for small housing in Sweden",
 		Version: "0.0.1",

@@ -60,7 +60,7 @@ type Mortgage struct {
 }
 
 //Hmm need to solve issue of rebateandtax being yearly if not jämkad.
-func HouseMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
+func HouseMonthly(price, operatingCost float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
 
 	mainRent, downPaymentRent, err := Rent(price, mortgage)
 	if err != nil {
@@ -74,7 +74,7 @@ func HouseMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRe
 		return 0, 0, err
 	}
 
-	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + HouseTax(price, taxProperty)/12.0,
+	return rentCost/12 + operatingCost/float64(12) + propertyInsuranceMonthly + HouseTax(price, taxProperty)/12.0,
 		mainAmortization/12 + dpAmortization/12,
 		nil
 }
