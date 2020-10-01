@@ -74,7 +74,7 @@ func HouseMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRe
 		return 0, 0, err
 	}
 
-	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + Tax(price, taxProperty)/12.0,
+	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + HouseTax(price, taxProperty)/12.0,
 		mainAmortization/12 + dpAmortization/12,
 		nil
 }
@@ -84,7 +84,7 @@ func RequiredDownPayment(price float64, downPayment DownPayment) float64 {
 }
 
 //Yearly
-func Tax(price float64, taxProperty TaxProperty) float64 {
+func HouseTax(price float64, taxProperty TaxProperty) float64 {
 	return math.Min(price*taxProperty.TaxationValuePercentageOfValue*taxProperty.Percent, taxProperty.Roof)
 }
 

@@ -108,7 +108,7 @@ func main() {
 				log.Fatalw("can't calculate rent", "error", err)
 			}
 			rebate := propertycost.Rebate(mRent+dpRent, rentRebate)
-			taxPropertyCost := propertycost.Tax(price, taxProperty)
+			taxPropertyCost := propertycost.HouseTax(price, taxProperty)
 
 			t := table.NewWriter()
 			t.SetStyle(table.StyleLight)
