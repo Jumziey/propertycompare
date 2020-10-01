@@ -122,7 +122,7 @@ func Rent(price float64, mortgage Mortgage) (mainRent float64, downPaymentRent f
 }
 
 //taxes are given i a decimal percentage i.e 50% = 0.5
-func HouseExtraAtPurchase(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax float64) float64 {
+func HousePurchaseFees(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax float64) float64 {
 	return MortgageDeed(price, mortgageDeedCurrent, mortgageDeedTax) + TitleDeed(price, titleDeedTax)
 }
 

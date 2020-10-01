@@ -174,7 +174,7 @@ func TestHouseExtraAtPurchase(t *testing.T) {
 	titleDeedTax := float64(0.2)
 	expectedTotalExtraCost := float64(29000)
 
-	totalExtraCost := HouseExtraAtPurchase(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax)
+	totalExtraCost := HousePurchaseFees(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax)
 
 	assert.Equal(t, expectedTotalExtraCost, totalExtraCost)
 }

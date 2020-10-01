@@ -97,7 +97,7 @@ func main() {
 			if err != nil {
 				log.Fatalw("Can't convert <current mortgage deed> to float", "error", err)
 			}
-			extracost := propertycost.HouseExtraAtPurchase(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
+			extracost := propertycost.HousePurchaseFees(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
 
 			realCostMonthly, amortizationMonthly, err := propertycost.HouseMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyInsuranceMonthly)
 			if err != nil {
