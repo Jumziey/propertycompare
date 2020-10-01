@@ -60,7 +60,7 @@ type Mortgage struct {
 }
 
 //Hmm need to solve issue of rebateandtax being yearly if not jämkad.
-func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
+func HouseMonthly(price, operatingCostMonthly float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
 
 	mainRent, downPaymentRent, err := Rent(price, mortgage)
 	if err != nil {
@@ -74,7 +74,7 @@ func CalculateMonthly(price, operatingCostMonthly float64, mortgage Mortgage, re
 		return 0, 0, err
 	}
 
-	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + TaxPropertyCost(price, taxProperty)/12.0,
+	return rentCost/12 + operatingCostMonthly + propertyInsuranceMonthly + Tax(price, taxProperty)/12.0,
 		mainAmortization/12 + dpAmortization/12,
 		nil
 }
@@ -84,7 +84,7 @@ func RequiredDownPayment(price float64, downPayment DownPayment) float64 {
 }
 
 //Yearly
-func TaxPropertyCost(price float64, taxProperty TaxProperty) float64 {
+func Tax(price float64, taxProperty TaxProperty) float64 {
 	return math.Min(price*taxProperty.TaxationValuePercentageOfValue*taxProperty.Percent, taxProperty.Roof)
 }
 
@@ -108,7 +108,6 @@ func Amortization(price float64, mortgage Mortgage) (mainAmortization float64, d
 	return mainAmortization, downPaymentAmortization, nil
 }
 
-//Yearly
 func Rent(price float64, mortgage Mortgage) (mainRent float64, downPaymentRent float64, err error) {
 	downPayment := mortgage.DownPayment
 
@@ -122,6 +121,21 @@ func Rent(price float64, mortgage Mortgage) (mainRent float64, downPaymentRent f
 	return mainRent, downPaymentRent, nil
 }
 
+//taxes are given i a decimal percentage i.e 50% = 0.5
+func HouseExtraAtPurchase(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax float64) float64 {
+	return MortgageDeed(price, mortgageDeedCurrent, mortgageDeedTax) + TitleDeed(price, titleDeedTax)
+}
+
+//taxes are given i a decimal percentage i.e 50% = 0.5
+func MortgageDeed(price, mortgageDeedCurrent, mortgageDeedTax float64) float64 {
+	return (price - mortgageDeedCurrent) * mortgageDeedTax
+}
+
+//taxes are given i a decimal percentage i.e 50% = 0.5
+func TitleDeed(price, titleDeedTax float64) float64 {
+	return price * titleDeedTax
+}
+
 func downPaymentBorrowed(price float64, downPayment DownPayment) float64 {
 	return math.Max(0, RequiredDownPayment(price, downPayment)-downPayment.AmountInHand)
 }
@@ -132,14 +146,4 @@ func mortgageTotal(price float64, mortgage Mortgage) (float64, error) {
 		return 0, errors.New("Can not down pay more then the price of the property")
 	}
 	return mortgageAmount, nil
-}
-
-//Takes the price of the house with the mortgage deed currently on the house and relevant tax percentage
-//for mortgage deeds and title deeds, and returns the total extra cost at purchase.
-//
-//taxes are given i a decimal percentage i.e 50% = 0.5
-func ExtraAtPurchase(price, mortgageDeedCurrent, mortgageDeedTax, titleDeedTax float64) float64 {
-	mortgageCost := (price - mortgageDeedCurrent) * mortgageDeedTax
-	titleDeedCost := price * titleDeedTax
-	return mortgageCost + titleDeedCost
 }

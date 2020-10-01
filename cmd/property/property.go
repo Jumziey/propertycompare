@@ -97,9 +97,9 @@ func main() {
 			if err != nil {
 				log.Fatalw("Can't convert <current mortgage deed> to float", "error", err)
 			}
-			extracost := propertycost.ExtraAtPurchase(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
+			extracost := propertycost.HouseExtraAtPurchase(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
 
-			realCostMonthly, amortizationMonthly, err := propertycost.CalculateMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyInsuranceMonthly)
+			realCostMonthly, amortizationMonthly, err := propertycost.HouseMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyInsuranceMonthly)
 			if err != nil {
 				log.Fatalw("can't calculate monthly costs", "error", err)
 			}
@@ -108,7 +108,7 @@ func main() {
 				log.Fatalw("can't calculate rent", "error", err)
 			}
 			rebate := propertycost.Rebate(mRent+dpRent, rentRebate)
-			taxPropertyCost := propertycost.TaxPropertyCost(price, taxProperty)
+			taxPropertyCost := propertycost.Tax(price, taxProperty)
 
 			t := table.NewWriter()
 			t.SetStyle(table.StyleLight)
