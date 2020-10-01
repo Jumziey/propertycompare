@@ -179,6 +179,114 @@ func TestHousePurchaseFees(t *testing.T) {
 	assert.Equal(t, expectedFees, totalExtraCost)
 }
 
+func TestCondoMonthly(t *testing.T) {
+	price := float64(1500000)
+	operatingCostMonthly := float64(12000)
+	propertyEnsuranceMonthly := float64(2000)
+	mortgage := Mortgage{
+		Rent:         0.04,
+		Amortization: 0.05,
+		DownPayment: DownPayment{
+			AmountInHand:       1000,
+			RequiredPercentage: 0.16,
+			Rent:               0.14,
+			Amortization:       0.12,
+		},
+	}
+	rentRebate := RentRebate{
+		Limit:       100000,
+		BeforeLimit: 0.3,
+		AfterLimit:  0.21,
+	}
+
+	expectedAmortizationMonthly := float64(7640)
+	expectedRealCostMonthly := float64(7891.83333333)
+
+	realCostMonthly, amortizationMonthly, _ := CondoMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyEnsuranceMonthly)
+	assert.InDelta(t, expectedRealCostMonthly, realCostMonthly, 0.001, "RealCostMonthly")
+	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
+}
+
+func TestCondoMonthlyMoreDownPaymentThenRequired(t *testing.T) {
+	price := float64(1500000)
+	operatingCostMonthly := float64(12000)
+	propertyEnsuranceMonthly := float64(2000)
+	mortgage := Mortgage{
+		Rent:         0.035,
+		Amortization: 0.05,
+		DownPayment: DownPayment{
+			AmountInHand:       250000,
+			RequiredPercentage: 0.16, //Should not matter
+			Rent:               0.14, //Should not matter
+			Amortization:       0.12, //Should not matter
+		},
+	}
+	rentRebate := RentRebate{
+		Limit:       100000,
+		BeforeLimit: 0.3,
+		AfterLimit:  0.21,
+	}
+
+	expectedRealCostMonthly := float64(5552.083333)
+	expectedAmortizationMonthly := float64(5208.3333333)
+
+	realCostMonthly, amortizationMonthly, _ := CondoMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyEnsuranceMonthly)
+	assert.InDelta(t, expectedRealCostMonthly, realCostMonthly, 0.001, "RealCostMonthly")
+	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
+}
+
+func TestCondoMonthlyTooMuchDownPayment(t *testing.T) {
+	price := float64(1500000)
+	operatingCostMonthly := float64(12000)
+	propertyEnsuranceMonthly := float64(2000)
+	mortgage := Mortgage{
+		Rent:         0.04,
+		Amortization: 0.05,
+		DownPayment: DownPayment{
+			AmountInHand:       price + 1,
+			RequiredPercentage: 0.16,
+			Rent:               0.14,
+			Amortization:       0.12,
+		},
+	}
+	rentRebate := RentRebate{
+		Limit:       100000,
+		BeforeLimit: 0.3,
+		AfterLimit:  0.21,
+	}
+
+	_, _, err := CondoMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyEnsuranceMonthly)
+	assert.NotNil(t, err)
+}
+
+func TestCondoMonthlyRentRebateAboveLimit(t *testing.T) {
+	price := float64(1500000)
+	operatingCostMonthly := float64(12000)
+	propertyEnsuranceMonthly := float64(2000)
+	mortgage := Mortgage{
+		Rent:         0.10,
+		Amortization: 0.05,
+		DownPayment: DownPayment{
+			AmountInHand:       1000,
+			RequiredPercentage: 0.16,
+			Rent:               0.14,
+			Amortization:       0.12,
+		},
+	}
+	rentRebate := RentRebate{
+		Limit:       100000,
+		BeforeLimit: 0.3,
+		AfterLimit:  0.21,
+	}
+
+	expectedAmortizationMonthly := float64(7640)
+	expectedRealCostMonthly := float64(12747.783333333333)
+
+	realCostMonthly, amortizationMonthly, _ := CondoMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyEnsuranceMonthly)
+	assert.InDelta(t, expectedRealCostMonthly, realCostMonthly, 0.001, "RealCostMonthly")
+	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
+}
+
 func TestCondoPurchaseFees(t *testing.T) {
 	price := float64(1000000)
 	mortgageDeedTax := float64(0.2)
@@ -188,5 +296,4 @@ func TestCondoPurchaseFees(t *testing.T) {
 	fees := CondoPurchaseFees(price, mortgageDeedCurrent, mortgageDeedTax)
 
 	assert.InDelta(t, expectedFees, fees, 1)
-
 }

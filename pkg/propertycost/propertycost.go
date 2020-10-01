@@ -59,8 +59,21 @@ type Mortgage struct {
 	DownPayment  DownPayment
 }
 
-//Hmm need to solve issue of rebateandtax being yearly if not jämkad.
-func HouseMonthly(price, operatingCost float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (AmortizationMonthly, RealCostMonthly float64, err error) {
+func HouseMonthly(price, operatingCost float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (RealCostMonthly, AmortizationMonthly float64, err error) {
+	condoCostMonthly, amortization, err := CondoMonthly(price, operatingCost, mortgage, rentRebate, propertyInsuranceMonthly)
+	if err != nil {
+		return 0, 0, err
+	}
+	return condoCostMonthly + HouseTax(price, taxProperty)/12.0,
+		amortization,
+		nil
+}
+
+func HouseTax(price float64, taxProperty TaxProperty) float64 {
+	return math.Min(price*taxProperty.TaxationValuePercentageOfValue*taxProperty.Percent, taxProperty.Roof)
+}
+
+func CondoMonthly(price, operatingCost float64, mortgage Mortgage, rentRebate RentRebate, propertyInsuranceMonthly float64) (RealCostMonthly, AmortizationMonthly float64, err error) {
 
 	mainRent, downPaymentRent, err := Rent(price, mortgage)
 	if err != nil {
@@ -74,18 +87,13 @@ func HouseMonthly(price, operatingCost float64, mortgage Mortgage, rentRebate Re
 		return 0, 0, err
 	}
 
-	return rentCost/12 + operatingCost/float64(12) + propertyInsuranceMonthly + HouseTax(price, taxProperty)/12.0,
+	return rentCost/12 + operatingCost/float64(12) + propertyInsuranceMonthly,
 		mainAmortization/12 + dpAmortization/12,
 		nil
 }
 
 func RequiredDownPayment(price float64, downPayment DownPayment) float64 {
 	return price * downPayment.RequiredPercentage
-}
-
-//Yearly
-func HouseTax(price float64, taxProperty TaxProperty) float64 {
-	return math.Min(price*taxProperty.TaxationValuePercentageOfValue*taxProperty.Percent, taxProperty.Roof)
 }
 
 //Yearly
