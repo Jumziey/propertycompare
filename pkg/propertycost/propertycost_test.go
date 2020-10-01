@@ -167,7 +167,7 @@ func TestHouseMonthlyTaxPropertyBelowRoof(t *testing.T) {
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
 
-func TestHouseExtraAtPurchase(t *testing.T) {
+func TestHousePurchaseFees(t *testing.T) {
 	price := float64(100000)
 	mortgageDeedCurrent := float64(10000)
 	mortgageDeedTax := float64(0.1)
