@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCalculateMonthly(t *testing.T) {
+func TestHouseMonthly(t *testing.T) {
 	price := float64(1500000)
 	operatingCostMonthly := float64(12000)
 	propertyEnsuranceMonthly := float64(2000)
@@ -39,7 +39,7 @@ func TestCalculateMonthly(t *testing.T) {
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
 
-func TestCalculateMonthlyMoreDownPaymentThenRequired(t *testing.T) {
+func TestHouseMonthlyMoreDownPaymentThenRequired(t *testing.T) {
 	price := float64(1500000)
 	operatingCostMonthly := float64(12000)
 	propertyEnsuranceMonthly := float64(2000)
@@ -72,7 +72,7 @@ func TestCalculateMonthlyMoreDownPaymentThenRequired(t *testing.T) {
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
 
-func TestCalculateMonthlyTooMuchDownPayment(t *testing.T) {
+func TestHouseMonthlyTooMuchDownPayment(t *testing.T) {
 	price := float64(1500000)
 	operatingCostMonthly := float64(12000)
 	propertyEnsuranceMonthly := float64(2000)
@@ -101,7 +101,7 @@ func TestCalculateMonthlyTooMuchDownPayment(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestCalculateMonthlyRentRebateAboveLimit(t *testing.T) {
+func TestHouseMonthlyRentRebateAboveLimit(t *testing.T) {
 	price := float64(1500000)
 	operatingCostMonthly := float64(12000)
 	propertyEnsuranceMonthly := float64(2000)
@@ -134,7 +134,7 @@ func TestCalculateMonthlyRentRebateAboveLimit(t *testing.T) {
 	assert.InDelta(t, expectedAmortizationMonthly, amortizationMonthly, 0.0001, "Amortization")
 }
 
-func TestCalculateMonthlyTaxPropertyBelowRoof(t *testing.T) {
+func TestHouseMonthlyTaxPropertyBelowRoof(t *testing.T) {
 	price := float64(1000000)
 	operatingCost := float64(12000)
 	propertyEnsuranceMonthly := float64(2000)
