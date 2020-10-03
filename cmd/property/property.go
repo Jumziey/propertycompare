@@ -73,9 +73,15 @@ func main() {
 		},
 	}
 
-	rootCmd := &cobra.Command{Use: "property"}
-	rootCmd.AddCommand(&cobra.Command{
+	cost := &cobra.Command{
 		Use:     "cost <price> <operating costs yearly> <property insurance monthly> <current mortgage deed>",
+		Short:   "Calculates the monthly cost for the property",
+		Long:    "It's calculating using all the rules relevant for small housing in Sweden",
+		Version: "0.0.1",
+	}
+
+	costHouse := &cobra.Command{
+		Use:     "house <price> <operating costs yearly> <property insurance monthly> <current mortgage deed>",
 		Short:   "Calculates the monthly cost for the property",
 		Long:    "It's calculating using all the rules relevant for small housing in Sweden",
 		Version: "0.0.1",
@@ -97,7 +103,7 @@ func main() {
 			if err != nil {
 				log.Fatalw("Can't convert <current mortgage deed> to float", "error", err)
 			}
-			extracost := propertycost.HousePurchaseFees(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
+			purchaseFees := propertycost.HousePurchaseFees(price, mortgageDeedCurrent, taxMortgageDeed, taxTitleDeed)
 
 			realCostMonthly, amortizationMonthly, err := propertycost.HouseMonthly(price, operatingCostMonthly, mortgage, rentRebate, taxProperty, propertyInsuranceMonthly)
 			if err != nil {
@@ -114,20 +120,73 @@ func main() {
 			t.SetStyle(table.StyleLight)
 			t.SetOutputMirror(os.Stdout)
 			t.AppendRows([]table.Row{
-				{"Total cash needed outside mortgage", fmt.Sprintf("%.1f", propertycost.RequiredDownPayment(price, mortgage.DownPayment)+extracost)},
-				{"One time cost at purchase", fmt.Sprintf("%.1f", extracost)},
+				{"Total cash needed outside mortgage", fmt.Sprintf("%.1f", propertycost.RequiredDownPayment(price, mortgage.DownPayment)+purchaseFees)},
+				{"Purchase fees", fmt.Sprintf("%.1f", purchaseFees)},
 				{"Down payment required", fmt.Sprintf("%.1f", propertycost.RequiredDownPayment(price, mortgage.DownPayment))},
 			})
 			t.AppendSeparator()
 			t.AppendRows([]table.Row{
-				{"Monthly payment With Rebate And Tax", fmt.Sprintf("%.1f", realCostMonthly+amortizationMonthly)},
-				{"Monthly payment Without Rebate And Tax", fmt.Sprintf("%.1f", realCostMonthly+amortizationMonthly-taxPropertyCost/12+rebate/12)},
-				{"Real cost monthly (with rebate and tax)", fmt.Sprintf("%.1f", realCostMonthly)},
+				{"Monthly payment with rebate and tax", fmt.Sprintf("%.1f", realCostMonthly+amortizationMonthly)},
+				{"Monthly payment without rebate and tax", fmt.Sprintf("%.1f", realCostMonthly+amortizationMonthly-taxPropertyCost/12+rebate/12)},
+				{"Real cost monthly with rebate and tax", fmt.Sprintf("%.1f", realCostMonthly)},
 				{"Amortization monthly", fmt.Sprintf("%.1f", amortizationMonthly)},
 			})
 			t.Render()
 		},
-	})
+	}
+	cost.AddCommand(costHouse)
+
+	costCondo := &cobra.Command{
+		Use:     "condo <price> <operating costs yearly> <property insurance monthly>",
+		Short:   "Calculates the monthly cost for the property",
+		Long:    "It's calculating using all the rules relevant for condominium in Sweden",
+		Version: "0.0.1",
+		Args:    cobra.ExactArgs(3),
+		Run: func(cmd *cobra.Command, args []string) {
+			price, err := strconv.ParseFloat(args[0], 64)
+			if err != nil {
+				log.Fatalw("Can't convert <price> to float", "error", err)
+			}
+			operatingCostMonthly, err := strconv.ParseFloat(args[1], 64)
+			if err != nil {
+				log.Fatalw("Can't convert <operating cost monthly> to float", "error", err)
+			}
+			propertyInsuranceMonthly, err := strconv.ParseFloat(args[2], 64)
+			if err != nil {
+				log.Fatalw("Can't convert <propertyInsuranceMonthly> to float", "error", err)
+			}
+
+			realCostMonthly, amortizationMonthly, err := propertycost.CondoMonthly(price, operatingCostMonthly, mortgage, rentRebate, propertyInsuranceMonthly)
+			if err != nil {
+				log.Fatalw("can't calculate monthly costs", "error", err)
+			}
+			mRent, dpRent, err := propertycost.Rent(price, mortgage)
+			if err != nil {
+				log.Fatalw("can't calculate rent", "error", err)
+			}
+			rebate := propertycost.Rebate(mRent+dpRent, rentRebate)
+
+			t := table.NewWriter()
+			t.SetStyle(table.StyleLight)
+			t.SetOutputMirror(os.Stdout)
+			t.AppendRows([]table.Row{
+				{"Total cash needed outside mortgage", fmt.Sprintf("%.1f", propertycost.RequiredDownPayment(price, mortgage.DownPayment))},
+				{"Down payment required", fmt.Sprintf("%.1f", propertycost.RequiredDownPayment(price, mortgage.DownPayment))},
+			})
+			t.AppendSeparator()
+			t.AppendRows([]table.Row{
+				{"Monthly payment with rebate", fmt.Sprintf("%.1f", realCostMonthly+amortizationMonthly)},
+				{"Monthly payment without rebate", fmt.Sprintf("%.1f", realCostMonthly+amortizationMonthly+rebate/12)},
+				{"Real cost monthly with rebate", fmt.Sprintf("%.1f", realCostMonthly)},
+				{"Amortization monthly", fmt.Sprintf("%.1f", amortizationMonthly)},
+			})
+			t.Render()
+		},
+	}
+	cost.AddCommand(costCondo)
+
+	rootCmd := &cobra.Command{Use: "property"}
+	rootCmd.AddCommand(cost)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalw("cant execute rootCommand", "error", err)
