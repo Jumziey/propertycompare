@@ -1,6 +1,38 @@
 package propertydb
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func defaultCity() City {
+	return City("Town")
+}
+
+func defaultAddress() StreetAddress {
+	return StreetAddress("Address 1")
+}
+
+func defaultInfo() Info {
+	return Info{
+		PriceAsking:              12,
+		PriceFinal:               14,
+		Type:                     House,
+		OperatingCosts:           1231,
+		PropertyInsuranceMonthly: 121,
+		CurrentMortgageDeed:      1238,
+		Notes:                    "Hello mr sunshine",
+	}
+}
+
+func defaultListing() Listing {
+	return Listing{
+		City:          defaultCity(),
+		StreetAddress: defaultAddress(),
+		Info:          defaultInfo(),
+	}
+}
 
 func ValidateAddAndShow(t *testing.T, pdb PropertyDB) {
 	//Add a valid property, make sure no error
