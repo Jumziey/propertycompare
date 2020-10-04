@@ -47,7 +47,12 @@ func ValidateAddAndShow(t *testing.T, pdb PropertyDB) {
 }
 
 func ValidateAddSameTwiceError(t *testing.T, pdb PropertyDB) {
-	//Add valid property twice, make sure an error Shows on second add
+	expectedListing := defaultListing()
+
+	err := pdb.Add(expectedListing.City, expectedListing.StreetAddress, expectedListing.Info)
+	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
+	err = pdb.Add(expectedListing.City, expectedListing.StreetAddress, expectedListing.Info)
+	assert.NotNil(t, err, ".Add(...) does not return error when trying to add an existing property")
 }
 
 func ValidateCityAndStreetAddressIdentifies(t *testing.T, pdb PropertyDB) {
