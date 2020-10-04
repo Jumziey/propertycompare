@@ -21,7 +21,7 @@ func ValidateUpdate(t *testing.T) {
 	//Add property, update property, validate update took place with Show
 }
 
-func ValidateList() {
+func ValidateList(t *testing.T) {
 	//Add three properties, validate same with List()
 }
 
