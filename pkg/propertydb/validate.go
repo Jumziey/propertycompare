@@ -56,10 +56,29 @@ func ValidateAddSameTwiceError(t *testing.T, pdb PropertyDB) {
 }
 
 func ValidateCityAndStreetAddressIdentifies(t *testing.T, pdb PropertyDB) {
-	//Add two valid properties in the same city but different addresses
-	//make sure no error
-	//Add two valid properties on the same address but different cities
-	//make sure no error
+	listingFirst := defaultListing()
+	listingSecond := Listing{
+		City:          City("SecretTown"),
+		StreetAddress: StreetAddress("Secret Address"),
+		Info: Info{
+			PriceAsking:              1212121,
+			PriceFinal:               14141414,
+			Type:                     House,
+			OperatingCosts:           1211,
+			PropertyInsuranceMonthly: 121,
+			CurrentMortgageDeed:      1238,
+			Notes:                    "Hello mr sunshine",
+		},
+	}
+	err := pdb.Add(listingFirst.City, listingFirst.StreetAddress, listingFirst.Info)
+	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
+	err = pdb.Add(listingSecond.City, listingSecond.StreetAddress, listingSecond.Info)
+	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
+
+	retSecond, err := pdb.Show(listingSecond.City, listingSecond.StreetAddress)
+	assert.Equal(t, listingSecond, retSecond)
+	retFirst, err := pdb.Show(listingFirst.City, listingFirst.StreetAddress)
+	assert.Equal(t, listingFirst, retFirst)
 }
 
 func ValidateUpdate(t *testing.T, pdb PropertyDB) {
