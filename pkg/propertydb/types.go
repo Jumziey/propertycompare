@@ -21,6 +21,7 @@ type Info struct {
 	OperatingCosts           float64
 	PropertyInsuranceMonthly float64
 	CurrentMortgageDeed      float64
+	Notes                    string
 }
 
 type Listing struct {
