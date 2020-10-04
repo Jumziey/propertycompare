@@ -2,11 +2,11 @@ package propertydb
 
 import "testing"
 
-func ValidateAddCity(t *testing.T) {
+func ValidateAddAndShow(t *testing.T) {
 	//Add a valid property, make sure no error
 	//Check city on Show
 }
-func ValidateErrorAddSameCityTwice(t *testing.T) {
+func ValidateAddSameTwiceError(t *testing.T) {
 	//Add valid property twice, make sure an error Shows on second add
 }
 func ValidateUpdateCity(t *testing.T) {
