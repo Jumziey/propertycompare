@@ -41,7 +41,7 @@ func ValidateAddAndShow(t *testing.T, pdb PropertyDB) {
 	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
 
 	listing, err := pdb.Show(expectedListing.City, expectedListing.StreetAddress)
-	assert.Nil(t, err, ".Show(...) returns error when trying to add a property")
+	assert.Nil(t, err, ".Show(...) returns error when trying to show an added property")
 
 	assert.Equal(t, expectedListing, listing)
 }
