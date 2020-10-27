@@ -76,8 +76,10 @@ func ValidateCityAndStreetAddressIdentifies(t *testing.T, pdb PropertyDB) {
 	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
 
 	retSecond, err := pdb.Show(listingSecond.City, listingSecond.StreetAddress)
+	assert.Nil(t, err, ".Show(...) returns error when trying to show the second added property")
 	assert.Equal(t, listingSecond, retSecond)
 	retFirst, err := pdb.Show(listingFirst.City, listingFirst.StreetAddress)
+	assert.Nil(t, err, ".Show(...) returns error when trying to show the first added property")
 	assert.Equal(t, listingFirst, retFirst)
 }
 
