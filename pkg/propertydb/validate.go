@@ -85,6 +85,19 @@ func ValidateCityAndStreetAddressIdentifies(t *testing.T, pdb PropertyDB) {
 
 func ValidateUpdate(t *testing.T, pdb PropertyDB) {
 	//Add property, update property, validate update took place with Show
+
+	listing := defaultListing()
+	err := pdb.Add(listing.City, listing.StreetAddress, listing.Info)
+	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
+
+	updatedListing := listing
+	updatedListing.Info.Notes = "I update and update"
+
+	pdb.Update(updatedListing.City, updatedListing.StreetAddress, updatedListing.Info)
+
+	l, err := pdb.Show(listing.City, listing.StreetAddress)
+	assert.Nil(t, err, ".Show(...) returns error when trying to read the updated listing")
+	assert.Equal(t, updatedListing, l)
 }
 
 func ValidateList(t *testing.T, pdb PropertyDB) {
