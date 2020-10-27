@@ -153,5 +153,55 @@ func ValidateList(t *testing.T, pdb PropertyDB) {
 }
 
 func ValidateDelete(t *testing.T, pdb PropertyDB) {
-	//Add three properties, delete one validate with List()
+	//Add three properties, delete one, validate with List()
+	l1 := defaultListing()
+	l2 := Listing{
+		City:          City("SecretTown"),
+		StreetAddress: StreetAddress("Secret Address"),
+		Info: Info{
+			PriceAsking:              1212121,
+			PriceFinal:               14141414,
+			Type:                     House,
+			OperatingCosts:           1211,
+			PropertyInsuranceMonthly: 121,
+			CurrentMortgageDeed:      1238,
+			Notes:                    "Hello mr sunshine",
+		},
+	}
+	l3 := Listing{
+		City:          City("ChristmasTown"),
+		StreetAddress: StreetAddress("Christmas Address"),
+		Info: Info{
+			PriceAsking:              1212111,
+			PriceFinal:               141914,
+			Type:                     Condo,
+			OperatingCosts:           1211,
+			PropertyInsuranceMonthly: 131,
+			CurrentMortgageDeed:      1228,
+			Notes:                    "Snow and Snow",
+		},
+	}
+
+	err := pdb.Add(l1.City, l1.StreetAddress, l1.Info)
+	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
+	err = pdb.Add(l2.City, l2.StreetAddress, l2.Info)
+	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
+	err = pdb.Add(l3.City, l3.StreetAddress, l3.Info)
+	assert.Nil(t, err, ".Add(...) returns error when trying to add a property")
+
+	err = pdb.Delete(l2.City, l2.StreetAddress)
+	assert.Nil(t, err, ".Delete(...) returns error when trying to delete a property")
+
+	listings, err := pdb.List()
+	assert.Nil(t, err, ".List(...) returns error when trying to list properties")
+	for _, l := range listings {
+		if l1 != l && l3 != l {
+			t.Log("l1", l1)
+			t.Log("l2", l2)
+			t.Log("l3", l3)
+			t.Log("l", l)
+			t.Log(".Delete() seem to interact weirdly with .List()")
+
+		}
+	}
 }
