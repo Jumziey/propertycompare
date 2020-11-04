@@ -19,3 +19,8 @@ Break even points for buying rental properties with rent, management cost, repai
 - `/repository/{property}` Data layer implementation
 - `/bin/{cmd,api,tools,...}`(Details/Outside deps) cli,database, web etc. 
 - `/` log/telemetry/(general stuff many applications can use)
+
+### Naming issue
+What to name the property cost calculating usecase? how to implement?
+What to name the property db usecase? How to implement? 
+
