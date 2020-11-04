@@ -141,3 +141,6 @@ We start with trying bbolt and take it from there :).
 
 ### Design
 Where does the implementation of propertdb interface make most sense? Where should the interface be?
+
+### Further development
+Break even points for buying rental properties with rent, management cost, repair cost, tax etc. 
