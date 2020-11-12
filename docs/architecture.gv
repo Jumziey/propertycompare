@@ -1,0 +1,29 @@
+digraph Architecture { 
+	label="Architecture \n Black arrow = using \n Open arrow = implement interface"
+
+	propertydbbbolt
+	propertydbdynamodb
+
+	subgraph cluster_property_domain {
+		operatingcosts
+		purchasefees
+		property[shape="rectangle"]
+		propertydb
+	}
+
+	
+	operatingcosts->property
+	purchasefees->property
+	propertydb->property
+	propertydbbbolt->propertydb[arrowhead="onormal"]
+	propertydbdynamodb->propertydb[arrowhead="onormal"]
+	
+	//Use case
+	//we have a user which want to save/list/search properties then present costs on them 
+	//with purchase fees and operating costs. Also want to take a diff on this.
+	listing[label="listing, find a better name"]
+	listing->propertydb
+	listing->purchasefees
+	listing->operatingcosts
+
+}
