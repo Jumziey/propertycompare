@@ -1,29 +1,33 @@
 digraph Architecture { 
-	label="Architecture \n Black arrow = using \n Open arrow = implement interface"
+	compound=true
+	rankdir=BT
+	label="Architecture \n Black arrow = using \n White arrow = implement interface"
 
-	propertydbbbolt
-	propertydbdynamodb
-
+	
 	subgraph cluster_property_domain {
-		operatingcosts
-		purchasefees
-		property[shape="rectangle"]
-		propertydb
+		label="package property"
+		operatingcosts[label="property.OperatingCosts"]
+		purchasefees[label="property.PurchaseFees"]
+		property[label="property.Property", shape="rectangle"]
+		propertydb[label="property.Db"]
 	}
 
 	
 	operatingcosts->property
 	purchasefees->property
 	propertydb->property
-	propertydbbbolt->propertydb[arrowhead="onormal"]
-	propertydbdynamodb->propertydb[arrowhead="onormal"]
-	
-	//Use case
-	//we have a user which want to save/list/search properties then present costs on them 
-	//with purchase fees and operating costs. Also want to take a diff on this.
-	listing[label="listing, find a better name"]
-	listing->propertydb
-	listing->purchasefees
-	listing->operatingcosts
 
+	subgraph cluster_propertydbimpl_domain {
+		label="package propertydb"
+		bbolt[label="BBolt"]
+		dynamodb[label="Dynamodb"]
+	}
+	bbolt->propertydb[arrowhead="onormal"]
+	dynamodb->propertydb[arrowhead="onormal"]
+
+	subgraph cluster_listing_usecase {
+		label="package listing"
+		listing[label="listing.Listing"]
+	}
+	listing->property[lhead=cluster_property_domain]
 }
