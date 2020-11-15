@@ -5,19 +5,6 @@ import (
 	"math"
 )
 
-//DownPayment describes a down payment and
-//its assocciated costs.
-//AmountInHand - how much money you have to pay down on the price of the house
-//RequiredPercentage - The percentage of property cost that needs to be a down payment
-//Rent(decimal form) - The rent on the down payment if you have to take a loan to reach the required down payment.
-//Amortization(decimal form) - The required Amortization percentage on the down payment you hade to take a loan for.
-type DownPayment struct {
-	AmountInHand       float64
-	RequiredPercentage float64
-	Rent               float64
-	Amortization       float64
-}
-
 //RentRebate describes the rent rebate you get
 //on loans. It's modelled after how the Swedish
 //rent rebate system works.
@@ -38,15 +25,6 @@ type TaxProperty struct {
 	TaxationValuePercentageOfValue float64
 	Percent                        float64
 	Roof                           float64
-}
-
-//Rent(decimal form)
-//Amortization(decimal form)
-//DownPayment - self explanatory
-type Mortgage struct {
-	Rent         float64
-	Amortization float64
-	DownPayment  DownPayment
 }
 
 func HouseMonthly(price, operatingCost float64, mortgage Mortgage, rentRebate RentRebate, taxProperty TaxProperty, propertyInsuranceMonthly float64) (RealCostMonthly, AmortizationMonthly float64, err error) {
