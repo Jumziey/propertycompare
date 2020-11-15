@@ -1,5 +1,6 @@
 digraph Architecture { 
 	compound=true
+	graph [pad="0", nodesep="0.5", ranksep="1.5"];
 	rankdir=BT
 	label="Architecture \n Black arrow = using \n White arrow = implement interface"
 
@@ -22,20 +23,20 @@ digraph Architecture {
 		operatingcosts[label="propertycost.Operating"]
 		purchasefees[label="propertycost.PurchaseFees"]
 	}
-	operatingcosts->mortgage[ltail=cluster_propertycost_usecase, lhead=cluster_loan_entity]
+	purchasefees->mortgage[ltail=cluster_propertycost_usecase, lhead=cluster_loan_entity]
 	
 	subgraph cluster_propertystore_entity {
 		label="package propertystore\n(repository implementation)"
 		bbolt[label="propertystore.BBolt"]
 		dynamodb[label="propertystore.Dynamodb"]
 	}
-	bbolt->propertystore[arrowhead="onormal"]
-	dynamodb->propertystore[arrowhead="onormal"]
+	bbolt->propertystore[arrowhead="onormal", lhead=cluster_property_entity]
+	dynamodb->propertystore[arrowhead="onormal", lhead=cluster_property_entity]
 
 	subgraph cluster_listing_usecase {
 		label="package listing\n(usecase)"
 		listing[label="listing.Listing", shape="rectangle"]
 	}
-	listing->property[lhead=cluster_property_entity]
-	listing->operatingcosts[lhead=cluster_propertycost_usecase]
+	listing->property[ltail=cluster_listing_usecase, lhead=cluster_property_entity]
+	listing->purchasefees[ltail=cluster_listing_usecase, lhead=cluster_propertycost_usecase]
 }
