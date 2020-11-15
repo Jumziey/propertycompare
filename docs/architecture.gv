@@ -4,30 +4,38 @@ digraph Architecture {
 	label="Architecture \n Black arrow = using \n White arrow = implement interface"
 
 	
-	subgraph cluster_property_domain {
-		label="package property"
-		operatingcosts[label="property.OperatingCosts"]
-		purchasefees[label="property.PurchaseFees"]
+	subgraph cluster_property_entity {
+		label="package property\n(entity)"
 		property[label="property.Property", shape="rectangle"]
-		propertydb[label="property.Db"]
+		propertystore[label="property.Store", shape="octagon"]
+		propertystore->property
 	}
 
+	subgraph cluster_loan_entity {
+		label="package loan \n(entity)"
+		loan[label="loan.Loan", shape="rectangle"]
+		mortgage[label="loan.Mortgage", shape="rectangle"]
+	}
+
+	subgraph cluster_propertycost_usecase {
+		label="package propertycost\n(usecase)"
+		operatingcosts[label="propertycost.Operating"]
+		purchasefees[label="propertycost.PurchaseFees"]
+	}
+	operatingcosts->mortgage[ltail=cluster_propertycost_usecase, lhead=cluster_loan_entity]
 	
-	operatingcosts->property
-	purchasefees->property
-	propertydb->property
-
-	subgraph cluster_propertydbimpl_domain {
-		label="package propertydb"
-		bbolt[label="BBolt"]
-		dynamodb[label="Dynamodb"]
+	subgraph cluster_propertystore_entity {
+		label="package propertystore\n(repository implementation)"
+		bbolt[label="propertystore.BBolt"]
+		dynamodb[label="propertystore.Dynamodb"]
 	}
-	bbolt->propertydb[arrowhead="onormal"]
-	dynamodb->propertydb[arrowhead="onormal"]
+	bbolt->propertystore[arrowhead="onormal"]
+	dynamodb->propertystore[arrowhead="onormal"]
 
 	subgraph cluster_listing_usecase {
-		label="package listing"
-		listing[label="listing.Listing"]
+		label="package listing\n(usecase)"
+		listing[label="listing.Listing", shape="rectangle"]
 	}
-	listing->property[lhead=cluster_property_domain]
+	listing->property[lhead=cluster_property_entity]
+	listing->operatingcosts[lhead=cluster_propertycost_usecase]
 }
