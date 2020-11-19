@@ -1,3 +1,5 @@
+//go:generate stringer -type=Type
+
 package property
 
 //City is the name of a city
