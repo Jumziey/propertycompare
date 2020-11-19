@@ -24,6 +24,7 @@ digraph Architecture {
 		purchasefees[label="propertycost.PurchaseFees"]
 	}
 	purchasefees->mortgage[ltail=cluster_propertycost_usecase, lhead=cluster_loan_entity]
+	purchasefees->property[ltail=cluster_propertycost_usecase, lhead=cluster_property_entity]
 	
 	subgraph cluster_propertystore_entity {
 		label="package propertystore\n(repository implementation)"
