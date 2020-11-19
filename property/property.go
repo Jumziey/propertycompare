@@ -30,7 +30,7 @@ func (pt *Type) Valid() bool {
 type Property struct {
 	//City is the name of the city the property exist in
 	City City
-	//StreedAddress is the street address of the property
+	//StreetAddress is the street address of the property
 	StreetAddress StreetAddress
 	//PriceAsking was the asking price for the property
 	PriceAsking float64
