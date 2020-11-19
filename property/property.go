@@ -34,10 +34,8 @@ type Property struct {
 	City City
 	//StreetAddress is the street address of the property
 	StreetAddress StreetAddress
-	//PriceAsking was the asking price for the property
-	PriceAsking float64
-	//PriceFinal the final price of the property
-	PriceFinal float64
+	//Value is the market value of the property
+	Value float64
 	//Type is the type of property
 	Type Type
 	//OperatingCosts is the operating cost of the property yearly
