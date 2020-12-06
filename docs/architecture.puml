@@ -1,0 +1,38 @@
+@startuml
+header
+	Property Compare
+end header
+
+package property {
+	[Property]
+	() StoreBackend
+	[Store] ..> StoreBackend: use
+}
+
+package propertyStoreBackend {
+	[BBolt] --> StoreBackend
+	[DynamoDB] --> StoreBackend
+}
+
+package loan {
+	[Mortgage]
+	[Loan]
+}
+
+package propertyCost {
+}
+
+propertyCost --> property
+propertyCost --> loan
+
+package listing {
+	[Listing]
+}
+
+listing --> property
+listing --> propertyCost
+
+package propertyCostCli 
+propertyCostCli -> propertyCost
+
+@enduml
